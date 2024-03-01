@@ -5,6 +5,7 @@ import { result, update } from 'lodash';
 import users from 'router/users';
 import { ObjectId } from 'mongoose';
 import { request,Response, NextFunction } from 'express';
+import cloudinary from 'utils/cloudinary';
 
 
 interface Person {
@@ -81,7 +82,10 @@ export const getAllUsers = async (req: express.Request, res: express.Response) =
   };
   export const addUsers = async (req: express.Request, res: express.Response) => {
     try {
-      const { firstName, lastName, email, phone, birthDate, username } = req.body;
+      const { firstName, lastName, email, phone, birthDate, username, image } = req.body;
+    //   const result = await cloudinary.v2.uploader.upload(image, {
+    //     folder: "users_img"
+    // });
   
       // Create a new Person document using the Person model
       const newUser = new PersonModel({
@@ -91,6 +95,7 @@ export const getAllUsers = async (req: express.Request, res: express.Response) =
         phone,
         birthDate,
         username,
+        image,
       });
   
       // Save the new user to the database
@@ -122,6 +127,20 @@ export const getAllUsers = async (req: express.Request, res: express.Response) =
         return res.status(500);
     }
   };
+  export const getUser = async (req: express.Request, res: express.Response) => {
+    try {
+    const userId = req?.params.userId;
+    console.log("mpo", userId);
+      const user = await PersonModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      return res.status(200).json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  };
 
   export const updateUser = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const userId = req.params.userId;
@@ -131,11 +150,12 @@ export const getAllUsers = async (req: express.Request, res: express.Response) =
     }
     try {
       const updatedUser = await PersonModel.findByIdAndUpdate(
-        req.params.id,
+        userId,
         req.body,
-        { new: true }
+        { new: true }      
       );
-      res.status(200).json(updatedUser);
+    console.log("dd", updatedUser)
+      res.status(200).json({MessageEvent: "user updated", updatedUser});
     } catch (error) {
       next(error);
     }

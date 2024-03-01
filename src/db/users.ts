@@ -25,12 +25,10 @@ const userSchema = new Schema<Person>({
     username: String,
     password: String,
     birthDate: String,
-    image: { type :String,
-              default:"https://cdn.pixabay.com/photo/2016/08/31/11/54/icon-1633249_1280.png" },
-    email: String,
-    
+    image: {type : String,
+            default:"https://cdn.pixabay.com/photo/2016/08/31/11/54/icon-1633249_1280.png" 
+    }
 });
-
 
 userSchema.plugin(mongooseAggregatePaginate);
 userSchema.plugin(mongoosePaginate);
@@ -39,4 +37,3 @@ const PersonModel = mongoose.model<Person>('user', userSchema);
 export default PersonModel;
 
 export const getUsers = () => PersonModel.find();
-
